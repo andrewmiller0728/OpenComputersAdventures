@@ -37,3 +37,26 @@ local function moveForward()
     -- log that moved forward 1 block
     return
 end
+
+-- Moves the robot forward by <distance> blocks
+local function moveForward(distance)
+    return
+end
+
+-- Turn specified number of rotations
+-- If rotations is positive, turn CW,
+--              if negative, turn CCW.
+local function turn(rotations) 
+    if rotations > 0 then
+        for i = 0, rotations, 1
+        do
+            robot.turnRight()
+        end
+    else
+        for i = 0, rotations, 1
+        do
+            robot.turnLeft()
+        end
+    end
+    return
+end
