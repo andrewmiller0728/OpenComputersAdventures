@@ -220,8 +220,12 @@ local function digLayer()
     return true
 end
 
-local i = 0
-repeat i = i + 1 until i >= sizeZ or not digLayer()
+local i = 1
+local layerDug = digLayer()
+while i < sizeZ and layerDug do
+    i = i + 1
+    layerDug = digLayer() 
+end
 moveTo(0, 0, 0)
 turnTowards(0)
 checkedDrop(true)
