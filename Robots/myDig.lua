@@ -24,7 +24,7 @@ end
 
 -- Validate command line arguments
 local sizeX, sizeY, sizeZ = tonumber(args[1]), tonumber(args[2]), tonumber(args[3])
-if not sizeX or not sizeY then
+if not sizeX or not sizeY or not sizeZ then
     io.stderr:write("Invalid size parameters")
     return
 end
@@ -219,9 +219,7 @@ local function digLayer()
 end
 
 local i = 0
-while digLayer() and i < sizeZ do
-    i = i + 1
-end
+repeat i = i + 1 until i >= sizeZ or not digLayer()
 moveTo(0, 0, 0)
 turnTowards(0)
 checkedDrop(true)
