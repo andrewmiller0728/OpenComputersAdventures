@@ -17,6 +17,7 @@ local args, ops = shell.parse(...)
 if #args < 1 then
     io.write("Usage: dig [-s] <size_x> <size_y> <size_z>\n")
     io.write(" x and y are on the horizontal plane, z is the vertical axis")
+    io.write(" <size_z> is the number of 3 block layers to mine")
     io.write(" -s: shutdown when done")
     return
 end
