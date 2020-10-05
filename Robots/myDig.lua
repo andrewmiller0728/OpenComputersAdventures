@@ -186,7 +186,7 @@ local function turn(i)
 end
 
 local function digLayer()
-    for lj = 1, sizeX do
+    for j = 1, sizeX do
         for k = 1, sizeY - 1 do
             if not step() then
                 return false
