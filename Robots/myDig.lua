@@ -192,6 +192,7 @@ local function digLayer()
             if not step() then
                 return false
             end
+            computer.beep()
         end
         if j < sizeX then
             -- End of a normal line, move the "cap".
@@ -211,6 +212,8 @@ local function digLayer()
                 end
             end
         end
+        computer.beep()
+        computer.beep()
     end
     return true
 end
