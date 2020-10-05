@@ -31,6 +31,8 @@ end
 
 local r = component.robot
 
+os.execute("midi /home/music/DonkeyKong-GameStart.mid")
+
 --[[ MOVEMENT ]]--
 
 -- (x, y, z) coordinates and r rotation {int x | 0 <= x <= 3}
@@ -192,7 +194,6 @@ local function digLayer()
             if not step() then
                 return false
             end
-            computer.beep()
         end
         if j < sizeX then
             -- End of a normal line, move the "cap".
@@ -213,8 +214,9 @@ local function digLayer()
             end
         end
         computer.beep()
-        computer.beep()
     end
+    computer.beep()
+    computer.beep()
     return true
 end
 
