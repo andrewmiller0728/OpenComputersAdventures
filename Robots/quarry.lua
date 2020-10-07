@@ -15,23 +15,22 @@ end
 -- Take in command line arguments
 local args, ops = shell.parse(...)
 if #args ~= 3 then
-    io.write("Usage: dig [-s] <size_x> <size_y> <size_z>\n")
-    io.write(" x and y are on the horizontal plane, z is the vertical axis")
-    io.write(" <size_z> is the number of 3 block layers to mine")
+    io.write("Usage: dig [-s] <size_xz> <size_y>\n")
+    io.write(" x and z are on the horizontal plane, y is the vertical axis\n")
+    io.write(" (size_xz> is the side length of the square quarry")
+    io.write(" <size_y> is the number of 3 block layers to mine\n")
     io.write(" -s: shutdown when done")
     return
 end
 
 -- Validate command line arguments
-local sizeX, sizeY, sizeZ = tonumber(args[1]), tonumber(args[2]), tonumber(args[3])
-if not sizeX or not sizeY or not sizeZ then
+local sizeX, sizeY = tonumber(args[1]), tonumber(args[2])
+if not sizeX or not sizeY then
     io.stderr:write("Invalid size parameters")
     return
 end
 
 local r = component.robot
-
-os.execute("midi /home/music/DonkeyKong-GameStart.mid")
 
 --[[ MOVEMENT ]]--
 
@@ -190,7 +189,7 @@ end
 
 local function digLayer()
     for j = 1, sizeX do
-        for k = 1, sizeY - 1 do
+        for k = 1, sizeX - 1 do
             if not step() then
                 return false
             end
@@ -222,7 +221,7 @@ end
 
 local i = 1
 local layerDug = digLayer()
-while i < sizeZ and layerDug do
+while i < sizeY and layerDug do
     i = i + 1
     layerDug = digLayer() 
 end
