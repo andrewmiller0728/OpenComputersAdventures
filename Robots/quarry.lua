@@ -14,10 +14,10 @@ end
 
 -- Take in command line arguments
 local args, ops = shell.parse(...)
-if #args ~= 3 then
-    io.write("Usage: dig [-s] <size_xz> <size_y>\n")
+if #args ~= 2 then
+    io.write("Usage: quarry [-s] <size_xz> <size_y>\n")
     io.write(" x and z are on the horizontal plane, y is the vertical axis\n")
-    io.write(" (size_xz> is the side length of the square quarry")
+    io.write(" <size_xz> is the side length of the square quarry")
     io.write(" <size_y> is the number of 3 block layers to mine\n")
     io.write(" -s: shutdown when done")
     return
