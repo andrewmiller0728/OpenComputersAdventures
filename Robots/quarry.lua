@@ -34,7 +34,7 @@ local r = component.robot
 
 --[[ MOVEMENT ]]--
 
--- (x, y, z) coordinates and r rotation {int x | 0 <= x <= 3}
+-- (x, y, z) coordinates and f rotation {int | 0 <= int <= 3}
 local x, y, z, f = 0, 0, 0, 0
 local dropping = false -- avoid recursing into drop()
 local delta = {[0] = function() x = x + 1 end, [1] = function() y = y + 1 end,
@@ -223,6 +223,21 @@ local i = 1
 local layerDug = digLayer()
 while i < sizeY and layerDug do
     i = i + 1
+
+    -- if tool is broken/missing, return to retrieve a new tool
+
+    local batteryMin = 0.15
+    local batteryMax = 0.95
+    local currentBattery = computer.energy() / computer.maxEnergy()
+    if currentBattery <= batteryMin then
+        local cx, cy, cz, cf = x, y, z, f
+        moveTo(0, 0, 0)
+        turnTowards(0)
+        repeat until currentBattery >= batteryMax
+        moveTo(cx, cy, cz)
+        turnTowards(f)
+    end
+
     layerDug = digLayer() 
 end
 moveTo(0, 0, 0)
