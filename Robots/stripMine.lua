@@ -25,7 +25,7 @@ if #args ~= 3 then
 end
 
 -- Validate command line arguments
-local length, widthL, widthR = tonumber(args[1]), tonumber(args[2]) tonumber(args[3])
+local length, widthL, widthR = tonumber(args[1]), tonumber(args[2]), tonumber(args[3])
 if not length or not widthL or not widthR then
     io.stderr:write("Invalid size parameters")
     return
