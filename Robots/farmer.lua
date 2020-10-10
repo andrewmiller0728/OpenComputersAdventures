@@ -8,6 +8,18 @@
 --      - Keep track of production rate
 
 
+-- [[ VARIABLES ]] -- 
+
+
+
+-- [[ FORWARD DECLARATION ]] -- 
+local resting
+local charging
+local tilling
+local sowing
+local harvesting
+
+
 -- [[ MAIN ]] --
 
 local function main()
@@ -15,6 +27,7 @@ local function main()
     -- Central loop, think like arduino code
     while (run) do
         -- Based on if...else switch between states
+        
     end
 end
 
