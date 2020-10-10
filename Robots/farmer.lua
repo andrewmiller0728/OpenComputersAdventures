@@ -26,6 +26,7 @@ local computer = require("computer")
 local robot = require("robot")
 local shell = require("shell")
 local sides = require("sides")
+local event = require("event")
 
 -- Program must be run on a robot
 if not component.isAvailable("robot") then
@@ -105,6 +106,8 @@ end
 function sowing()
     -- sow seeds in all designated, tilled, unoccupied blocks
     -- return unused seeds to storage
+
+    harvestTimer = event.Timer(WHEAT_TIMER, computer.pushSignal("HARVEST", computer.uptime()))
 end
 
 function harvesting()
@@ -140,6 +143,6 @@ end
 
 -- [[ MAIN ]] --
 
-while true do
-    checkBattery()
-end
+-- init farm
+tilling()
+sowing()
