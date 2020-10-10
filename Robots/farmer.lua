@@ -10,7 +10,7 @@
  ---------- ---------- ---------- ---------- ---------- ---------- ----------
 
 
--- [[ SET UP]] -- 
+-- [[ SET UP]] --
 
 local component = require("component")
 local computer = require("computer")
@@ -61,6 +61,8 @@ local tilling
 local sowing
 local harvesting
 
+local replaceTool
+
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
 
 
@@ -80,26 +82,26 @@ end
 
 -- [[ STATES ]] --
 
-local function resting()
+function resting()
     -- wait for future input
 end
 
-local function charging()
+function charging()
     -- Return to charger
     -- Wait for full charge
 end
 
-local function tilling()
+function tilling()
     -- till all designated blocks
     -- do not till blocks which are already tilled
 end
 
-local function sowing()
+function sowing()
     -- sow seeds in all designated, tilled, unoccupied blocks
     -- return unused seeds to storage
 end
 
-local function harvesting()
+function harvesting()
     -- Harvest all crops at appropriate intervals
     -- Return harvested crops and seeds to storage
     -- BONUS: havest only mature crops
@@ -110,7 +112,7 @@ end
 
 -- [[ COMMON TASKS ]] --
 
-local function replaceTool(tool)
+function replaceTool(tool)
     -- Discard current tool
     -- Retrieve new tool from storage
     -- BONUS: if no tools in storage, make one
