@@ -186,7 +186,6 @@ local cf = f
 -- Build T junction
 for i = 0, math.floor(length / 3) do
     -- Root
-    turnTowards(f)
     local j = 0
     repeat
         step()
@@ -203,21 +202,20 @@ for i = 0, math.floor(length / 3) do
         step()
         j = j + 1
     until j >= widthL
-
-    -- Right arm
     turnRight()
     turnRight()
     moveTo(cx, cy, cz)
+
+    -- Right arm
     j = 0
     repeat
         step()
         j = j + 1
     until j >= widthR
-
-    -- Re-center
     turnLeft()
     turnLeft()
     moveTo(cx, cy, cz)
+    turnTowards(cf)
 end
 turnTowards(cf)
 for i = 0, length % 3 do
