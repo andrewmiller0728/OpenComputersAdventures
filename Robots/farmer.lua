@@ -7,6 +7,11 @@
 --      - Have a personal UX
 --      - Keep track of production rate
 
+-- Resources:
+--      - https://ocdoc.cil.li/api:robot
+--      - https://ocdoc.cil.li/component:robot
+--      - https://ocdoc.cil.li/component:computer
+
  ---------- ---------- ---------- ---------- ---------- ---------- ----------
 
 
@@ -23,6 +28,8 @@ if not component.isAvailable("robot") then
     io.stderr:write("Error - Can only run on robots")
     return
 end
+
+local r = component.robot
 
 -- Take in command line arguments
 local args, ops = shell.parse(...)
@@ -48,11 +55,6 @@ end
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
 
 
--- [[ VARIABLES ]] --
-
----------- ---------- ---------- ---------- ---------- ---------- ----------
-
-
 -- [[ FORWARD DECLARATION ]] --
 
 local resting
@@ -66,6 +68,14 @@ local replaceTool
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
 
 
+-- [[ VARIABLES ]] --
+
+local batteryLevel = computer.energy() / computer.maxEnergy()
+local final LOW_BATTERY = 0.15
+
+---------- ---------- ---------- ---------- ---------- ---------- ----------
+
+
 -- [[ MAIN ]] --
 
 local function main()
@@ -73,7 +83,8 @@ local function main()
     -- Central loop, think like arduino code
     while (run) do
         -- Based on if...else switch between states
-        
+        if (batteryLevel <= LOW_BATTERY) then
+            computer.pushSignal("LOW_BATTERY")
     end
 end
 
@@ -119,3 +130,5 @@ function replaceTool(tool)
 end
 
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
+
+end
