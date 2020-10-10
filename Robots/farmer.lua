@@ -12,6 +12,7 @@
 --      - https://ocdoc.cil.li/api:robot
 --      - https://ocdoc.cil.li/api:computer
 --      - https://ocdoc.cil.li/api:thread
+--      - https://ocdoc.cil.li/api:sides
 --
 --      - https://ocdoc.cil.li/component:robot
 --      - https://ocdoc.cil.li/component:computer
@@ -27,6 +28,7 @@ local robot = require("robot")
 local shell = require("shell")
 local sides = require("sides")
 local event = require("event")
+local thread = require("thread")
 
 -- Program must be run on a robot
 if not component.isAvailable("robot") then
@@ -56,6 +58,14 @@ elseif false then -- TODO: if file not found then
 end
 
 -- Parse farm file and build database
+local farmFile = io.open(filename, "r")
+for i = 1, io.lines() do
+    io.write(io.read("l"))
+end
+io.close(farmFile)
+
+-- Save init position and orientation data
+local x, y, z, f = 0, 0, 0, sides.front
 
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
 
@@ -91,6 +101,7 @@ local harvestTimer -- event.Timer(WHEAT_TIMER,
 
 function resting()
     -- wait for future input
+    -- TODO: event.pull()
 end
 
 function charging()
@@ -143,6 +154,9 @@ end
 
 -- [[ MAIN ]] --
 
+
+
 -- init farm
 tilling()
 sowing()
+resting()
