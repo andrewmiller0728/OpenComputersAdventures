@@ -8,7 +8,11 @@
 --      - Keep track of production rate
 
 -- Resources:
+--      - https://ocdoc.cil.li/api:event
 --      - https://ocdoc.cil.li/api:robot
+--      - https://ocdoc.cil.li/api:computer
+--      - https://ocdoc.cil.li/api:thread
+--
 --      - https://ocdoc.cil.li/component:robot
 --      - https://ocdoc.cil.li/component:computer
 
@@ -57,21 +61,29 @@ end
 
 -- [[ FORWARD DECLARATION ]] --
 
+-- States
 local resting
 local charging
 local tilling
 local sowing
 local harvesting
 
+-- Helpers
 local replaceTool
+local getBatteryLevel
+local checkBattery
 
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
 
 
 -- [[ VARIABLES ]] --
 
-local batteryLevel = computer.energy() / computer.maxEnergy()
-local final LOW_BATTERY = 0.15
+local batteryLevel = getBatteryLevel()
+local LOW_BATTERY = 0.15
+
+local WHEAT_TIMER = 30 * 60 -- 30 minutes in seconds
+local harvestTimer -- event.Timer(WHEAT_TIMER, 
+                               -- computer.pushSignal("HARVEST", computer.uptime()))
 
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
 
@@ -79,13 +91,14 @@ local final LOW_BATTERY = 0.15
 -- [[ MAIN ]] --
 
 local function main()
+
     local run = true
     -- Central loop, think like arduino code
     while (run) do
-        -- Based on if...else switch between states
-        if (batteryLevel <= LOW_BATTERY) then
-            computer.pushSignal("LOW_BATTERY")
+        checkBattery()
+        
     end
+
 end
 
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
@@ -129,6 +142,15 @@ function replaceTool(tool)
     -- BONUS: if no tools in storage, make one
 end
 
----------- ---------- ---------- ---------- ---------- ---------- ----------
-
+function getBatteryLevel()
+    return computer.energy() / computer.maxEnergy()
 end
+
+function checkBattery()
+    batteryLevel = getBatteryLevel()
+    if (batteryLevel <= LOW_BATTERY) then
+        computer.pushSignal("CHARGE", batteryLevel)
+    end
+end
+
+---------- ---------- ---------- ---------- ---------- ---------- ----------
