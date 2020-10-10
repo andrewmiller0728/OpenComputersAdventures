@@ -17,7 +17,17 @@
 --      - https://ocdoc.cil.li/component:robot
 --      - https://ocdoc.cil.li/component:computer
 
- ---------- ---------- ---------- ---------- ---------- ---------- ----------
+---------- ---------- ---------- ---------- ---------- ---------- ----------
+
+
+-- [[ VARIABLES ]] --
+local LOW_BATTERY = 0.15
+
+local WHEAT_TIMER = 30 * 60 -- 30 minutes in seconds
+local harvestTimer -- event.Timer(WHEAT_TIMER, 
+                               -- computer.pushSignal("HARVEST", computer.uptime()))
+
+---------- ---------- ---------- ---------- ---------- ---------- ----------
 
 
 -- [[ SET UP]] --
@@ -64,16 +74,6 @@ io.close(farmFile)
 
 -- Save init position and orientation data
 local x, y, z, f = 0, 0, 0, 0
-
----------- ---------- ---------- ---------- ---------- ---------- ----------
-
-
--- [[ VARIABLES ]] --
-local LOW_BATTERY = 0.15
-
-local WHEAT_TIMER = 30 * 60 -- 30 minutes in seconds
-local harvestTimer -- event.Timer(WHEAT_TIMER, 
-                               -- computer.pushSignal("HARVEST", computer.uptime()))
 
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
 
@@ -149,12 +149,14 @@ end
 -- [[ STATES ]] --
 
 local function resting()
+    moveTo(0, 0, 0)
     -- wait for future input
     -- TODO: event.pull()
 end
 
 local function charging()
     -- Return to charger
+    -- Where is charger?
     -- Wait for full charge
 end
 
