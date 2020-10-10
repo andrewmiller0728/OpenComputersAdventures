@@ -22,11 +22,9 @@
 
 -- [[ VARIABLES ]] --
 local LOW_BATTERY = 0.15
-
 local WHEAT_TIMER = 30 * 60 -- 30 minutes in seconds
-local harvestTimer -- event.Timer(WHEAT_TIMER, 
-                               -- computer.pushSignal("HARVEST", computer.uptime()))
 
+local harvestTimer
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
 
 
@@ -73,7 +71,7 @@ end
 io.close(farmFile)
 
 -- Save init position and orientation data
-local x, y, z, f = 0, 0, 0, 0
+local x, y, z, o = 0, 0, 0, 0
 
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
 
@@ -102,19 +100,24 @@ end
 
 -- [[ MOVEMENT ]] --
 
-local function turnTo(tf)
-    if f == tf - 1 then
+-- Turns to specified orientation
+local function turnTo(to)
+    if o == to - 1 then
         robot.turnRight()
-        f = (f + 1) % 4
+        o = (o + 1) % 4
     else
-        while f ~= tf do
+        while o ~= to do
             robot.turnLeft()
-            f = (f - 1) % 4
+            o = (o - 1) % 4
         end
     end
 end
 
+-- Moves in y, then z, then x
+-- Starting orientation is preserved
 local function moveTo(tx, ty, tz)
+    local starto = o
+
     while y < ty do
         robot.up()
         y = y + 1
@@ -141,6 +144,8 @@ local function moveTo(tx, ty, tz)
     while x > tx do
         robot.back()
     end
+
+    turnTo(starto)
 end
 
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
@@ -150,8 +155,7 @@ end
 
 local function resting()
     moveTo(0, 0, 0)
-    -- wait for future input
-    -- TODO: event.pull()
+    event.pull()
 end
 
 local function charging()
@@ -182,8 +186,6 @@ end
 
 
 -- [[ MAIN ]] --
-
-
 
 -- init farm
 tilling()
