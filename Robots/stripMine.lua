@@ -4,33 +4,32 @@ local robot = require("robot")
 local shell = require("shell")
 local sides = require("sides")
 
---[[ Set Up ]]--
+--[[ SET UP ]]--
 
 -- Program must be run on a robot
 if not component.isAvailable("robot") then
     io.stderr:write("can only run on robots")
     return
 end
+local r = component.robot
 
 -- Take in command line arguments
 local args, ops = shell.parse(...)
-if #args ~= 2 then
-    io.write("Usage: quarry [-s] <size_xz> <size_y>\n")
-    io.write(" x and z are on the horizontal plane, y is the vertical axis\n")
-    io.write(" <size_xz> is the side length of the square quarry")
-    io.write(" <size_y> is the number of 3 block layers to mine\n")
-    io.write(" -s: shutdown when done")
+if #args ~= 3 then
+    io.write("Usage: stripMine [-s] <length> <width_l> <width_r>\n")
+    io.write("\t<length>: length of the strip mine")
+    io.write("\t<width_l>: width of junction left arm")
+    io.write("\t<width_r>: width of junction right arm")
+    io.write("\t-s: shutdown when done")
     return
 end
 
 -- Validate command line arguments
-local sizeX, sizeY = tonumber(args[1]), tonumber(args[2])
-if not sizeX or not sizeY then
+local length, widthL, widthR = tonumber(args[1]), tonumber(args[2]), tonumber(args[3])
+if not length or not widthL or not widthR then
     io.stderr:write("Invalid size parameters")
     return
 end
-
-local r = component.robot
 
 --[[ MOVEMENT ]]--
 
@@ -178,77 +177,57 @@ local function step()
     clearBlock(sides.up)
     return true
 end
-  
-local function turn(i)
-    if i % 2 == 1 then
-        turnRight()
-    else
-        turnLeft()
-    end
+
+--[[ MAIN ]]--
+
+-- "Front"
+local cf = f
+
+-- Build T junction
+for i = 0, math.floor(length / 3) - 1 do
+    -- Root
+    local j = 0
+    repeat
+        step()
+        j = j + 1
+    until j >= 3
+
+    -- Center point
+    local cx, cy, cz = x, y, z
+
+    -- Left arm
+    turnLeft()
+    j = 0
+    repeat
+        step()
+        j = j + 1
+    until j >= widthL
+    turnRight()
+    turnRight()
+    moveTo(cx, cy, cz)
+
+    -- Right arm
+    j = 0
+    repeat
+        step()
+        j = j + 1
+    until j >= widthR
+    turnLeft()
+    turnLeft()
+    moveTo(cx, cy, cz)
+    turnTowards(cf)
+end
+turnTowards(cf)
+for i = 0, length % 3 - 1 do
+    step()
 end
 
-local function digLayer()
-    for j = 1, sizeX do
-        for k = 1, sizeX - 1 do
-            if not step() then
-                return false
-            end
-        end
-        if j < sizeX then
-            -- End of a normal line, move the "cap".
-            turn(j)
-            if not step() then
-                return false
-            end
-            turn(j)
-        else
-            turnRight()
-            if sizeX % 2 == 1 then
-                turnRight()
-            end
-            for l = 1, 3 do
-                if not tryMove(sides.down) then
-                    return false
-                end
-            end
-        end
-        computer.beep()
-    end
-    computer.beep()
-    computer.beep()
-    return true
-end
-
-local i = 1
-local layerDug = digLayer()
-while i < sizeY and layerDug do
-    i = i + 1
-
-    -- if tool is broken/missing, return to retrieve a new tool
-
-    local batteryMin = 0.15
-    local batteryMax = 0.95
-    local currentBattery = computer.energy() / computer.maxEnergy()
-    if currentBattery <= batteryMin then
-        local cx, cy, cz, cf = x, y, z, f
-        moveTo(0, y, 0)
-        moveTo(0, 0, 0)
-        turnTowards(0)
-        repeat
-            os.sleep(1)
-            computer.beep()
-        until currentBattery >= batteryMax
-        moveTo(cx, cy, cz)
-        turnTowards(f)
-    end
-
-    layerDug = digLayer() 
-end
-moveTo(0, y, 0)
+-- return home
 moveTo(0, 0, 0)
 turnTowards(0)
 checkedDrop(true)
 
+-- if [-s] flag, shutdown
 if ops.s then
     computer.shutdown()
 end
