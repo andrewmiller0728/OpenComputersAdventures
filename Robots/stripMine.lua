@@ -184,7 +184,7 @@ end
 local cf = f
 
 -- Build T junction
-for i = 0, math.floor(length / 3) do
+for i = 0, math.floor(length / 3) - 1 do
     -- Root
     local j = 0
     repeat
@@ -218,7 +218,7 @@ for i = 0, math.floor(length / 3) do
     turnTowards(cf)
 end
 turnTowards(cf)
-for i = 0, length % 3 do
+for i = 0, length % 3 - 1 do
     step()
 end
 
