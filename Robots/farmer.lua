@@ -77,29 +77,11 @@ local checkBattery
 
 
 -- [[ VARIABLES ]] --
-
-local batteryLevel = getBatteryLevel()
 local LOW_BATTERY = 0.15
 
 local WHEAT_TIMER = 30 * 60 -- 30 minutes in seconds
 local harvestTimer -- event.Timer(WHEAT_TIMER, 
                                -- computer.pushSignal("HARVEST", computer.uptime()))
-
----------- ---------- ---------- ---------- ---------- ---------- ----------
-
-
--- [[ MAIN ]] --
-
-local function main()
-
-    local run = true
-    -- Central loop, think like arduino code
-    while (run) do
-        checkBattery()
-        
-    end
-
-end
 
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
 
@@ -147,10 +129,17 @@ function getBatteryLevel()
 end
 
 function checkBattery()
-    batteryLevel = getBatteryLevel()
+    local batteryLevel = getBatteryLevel()
     if (batteryLevel <= LOW_BATTERY) then
         computer.pushSignal("CHARGE", batteryLevel)
     end
 end
 
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
+
+
+-- [[ MAIN ]] --
+
+while true do
+    checkBattery()
+end
