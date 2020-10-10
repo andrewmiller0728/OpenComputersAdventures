@@ -36,8 +36,6 @@ if not component.isAvailable("robot") then
     return
 end
 
-local r = component.robot
-
 -- Take in command line arguments
 local args, ops = shell.parse(...)
 if #args ~= 1 then
@@ -57,7 +55,7 @@ elseif false then -- TODO: if file not found then
     return
 end
 
--- Parse farm file and build database
+-- TODO: Parse farm file and build database
 local farmFile = io.open(filename, "r")
 for i = 1, io.lines() do
     io.write(io.read("l"))
@@ -65,24 +63,7 @@ end
 io.close(farmFile)
 
 -- Save init position and orientation data
-local x, y, z, f = 0, 0, 0, sides.front
-
----------- ---------- ---------- ---------- ---------- ---------- ----------
-
-
--- [[ FORWARD DECLARATION ]] --
-
--- States
-local resting
-local charging
-local tilling
-local sowing
-local harvesting
-
--- Helpers
-local replaceTool
-local getBatteryLevel
-local checkBattery
+local x, y, z, f = 0, 0, 0, 0
 
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
 
@@ -97,56 +78,102 @@ local harvestTimer -- event.Timer(WHEAT_TIMER,
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
 
 
+-- [[ COMMON TASKS ]] --
+
+local function replaceTool(tool)
+    -- Discard current tool
+    -- Retrieve new tool from storage
+    -- BONUS: if no tools in storage, make one
+end
+
+local function getBatteryLevel()
+    return computer.energy() / computer.maxEnergy()
+end
+
+local function checkBattery()
+    local batteryLevel = getBatteryLevel()
+    if (batteryLevel <= LOW_BATTERY) then
+        computer.pushSignal("CHARGE", batteryLevel)
+    end
+end
+
+---------- ---------- ---------- ---------- ---------- ---------- ----------
+
+
+-- [[ MOVEMENT ]] --
+
+local function turnTo(tf)
+    if f == tf - 1 then
+        robot.turnRight()
+        f = (f + 1) % 4
+    else
+        while f ~= tf do
+            robot.turnLeft()
+            f = (f - 1) % 4
+        end
+    end
+end
+
+local function moveTo(tx, ty, tz)
+    while y < ty do
+        robot.up()
+        y = y + 1
+    end
+    while y > ty do
+        robot.down()
+        y = y - 1
+    end
+
+    turnTo(0)
+    while z < tz do
+        robot.forward()
+        z = z + 1
+    end
+    while z > tz do
+        robot.back()
+        z = z - 1
+    end
+
+    turnTo(3)
+    while x < tx do
+        robot.forward()
+    end
+    while x > tx do
+        robot.back()
+    end
+end
+
+---------- ---------- ---------- ---------- ---------- ---------- ----------
+
+
 -- [[ STATES ]] --
 
-function resting()
+local function resting()
     -- wait for future input
     -- TODO: event.pull()
 end
 
-function charging()
+local function charging()
     -- Return to charger
     -- Wait for full charge
 end
 
-function tilling()
+local function tilling()
     -- till all designated blocks
     -- do not till blocks which are already tilled
 end
 
-function sowing()
+local function sowing()
     -- sow seeds in all designated, tilled, unoccupied blocks
     -- return unused seeds to storage
 
     harvestTimer = event.Timer(WHEAT_TIMER, computer.pushSignal("HARVEST", computer.uptime()))
 end
 
-function harvesting()
+local function harvesting()
     -- Harvest all crops at appropriate intervals
     -- Return harvested crops and seeds to storage
     -- BONUS: havest only mature crops
-end
-
----------- ---------- ---------- ---------- ---------- ---------- ----------
-
-
--- [[ COMMON TASKS ]] --
-
-function replaceTool(tool)
-    -- Discard current tool
-    -- Retrieve new tool from storage
-    -- BONUS: if no tools in storage, make one
-end
-
-function getBatteryLevel()
-    return computer.energy() / computer.maxEnergy()
-end
-
-function checkBattery()
-    local batteryLevel = getBatteryLevel()
-    if (batteryLevel <= LOW_BATTERY) then
-        computer.pushSignal("CHARGE", batteryLevel)
-    end
 end
 
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
