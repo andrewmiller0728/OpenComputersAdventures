@@ -180,10 +180,13 @@ end
 
 --[[ MAIN ]]--
 
+-- "Front"
+local cf = f
+
 -- Build T junction
 for i = 0, math.floor(length / 3) do
     -- Root
-    turnTowards(sides.forward)
+    turnTowards(f)
     local j = 0
     repeat
         step()
@@ -194,7 +197,7 @@ for i = 0, math.floor(length / 3) do
     local cx, cy, cz = x, y, z
 
     -- Left arm
-    turnTowards(sides.left)
+    turnLeft()
     j = 0
     repeat
         step()
@@ -202,8 +205,9 @@ for i = 0, math.floor(length / 3) do
     until j >= widthL
 
     -- Right arm
+    turnRight()
+    turnRight()
     moveTo(cx, cy, cz)
-    turnTowards(sides.right)
     j = 0
     repeat
         step()
@@ -211,9 +215,11 @@ for i = 0, math.floor(length / 3) do
     until j >= widthR
 
     -- Re-center
+    turnLeft()
+    turnLeft()
     moveTo(cx, cy, cz)
 end
-turnTowards(sides.forward)
+turnTowards(cf)
 for i = 0, length % 3 do
     step()
 end

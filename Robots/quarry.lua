@@ -231,15 +231,20 @@ while i < sizeY and layerDug do
     local currentBattery = computer.energy() / computer.maxEnergy()
     if currentBattery <= batteryMin then
         local cx, cy, cz, cf = x, y, z, f
+        moveTo(0, y, 0)
         moveTo(0, 0, 0)
         turnTowards(0)
-        repeat until currentBattery >= batteryMax
+        repeat
+            os.sleep(1)
+            computer.beep()
+        until currentBattery >= batteryMax
         moveTo(cx, cy, cz)
         turnTowards(f)
     end
 
     layerDug = digLayer() 
 end
+moveTo(0, y, 0)
 moveTo(0, 0, 0)
 turnTowards(0)
 checkedDrop(true)
