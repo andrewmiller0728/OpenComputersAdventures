@@ -155,31 +155,42 @@ end
 
 local function resting()
     moveTo(0, 0, 0)
-    event.pull()
+    local currEvent = nil
+    repeat 
+        currEvent = event.pull(5) 
+    until currEvent ~= nil end
+    if currEvent == "HARVEST" then
+        harvesting()
+    end
 end
 
 local function charging()
     -- Return to charger
     -- Where is charger?
     -- Wait for full charge
+    resting()
 end
 
 local function tilling()
     -- till all designated blocks
     -- do not till blocks which are already tilled
+    computer.pushSignal("SOW")
+    resting()
 end
 
 local function sowing()
     -- sow seeds in all designated, tilled, unoccupied blocks
     -- return unused seeds to storage
-
+    
     harvestTimer = event.Timer(WHEAT_TIMER, computer.pushSignal("HARVEST", computer.uptime()))
+    resting()
 end
 
 local function harvesting()
     -- Harvest all crops at appropriate intervals
     -- Return harvested crops and seeds to storage
     -- BONUS: havest only mature crops
+    resting()
 end
 
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
@@ -189,5 +200,3 @@ end
 
 -- init farm
 tilling()
-sowing()
-resting()
