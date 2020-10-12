@@ -34,6 +34,10 @@ local harvestTimer
 
 -- Charger Location
 local chx, chy, chz
+-- Farm Southeast Corner
+local fmx, fmy, fmz
+-- Farm Square Dimensions
+local fmw, fmh
 
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
 
@@ -88,12 +92,6 @@ local x, y, z, o = 0, 0, 0, 0
 
 -- [[ COMMON TASKS ]] --
 
-local function replaceTool(tool)
-    -- Discard current tool
-    -- Retrieve new tool from storage
-    -- BONUS: if no tools in storage, make one
-end
-
 local function getBatteryLevel()
     return computer.energy() / computer.maxEnergy()
 end
@@ -103,6 +101,21 @@ local function checkBattery()
     if (batteryLevel <= LOW_BATTERY) then
         computer.pushSignal("CHARGE", batteryLevel)
     end
+    return
+end
+
+local function replaceTool(tool)
+    -- Discard current tool
+    -- Retrieve new tool from storage
+    -- BONUS: if no tools in storage, make one
+    return
+end
+
+-- Tills dirt block below with a hoe
+local function tillBelow()
+    -- if a hoe is broken/missing:
+    replaceTool("HOE")
+    return
 end
 
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
@@ -123,36 +136,70 @@ local function turnTo(to)
     end
 end
 
+local function movePosX()
+    turnTo(3)
+    robot.forward()
+    x = x + 1
+    return
+end
+
+local function moveNegX()
+    turnTo(1)
+    robot.forward()
+    x = x - 1
+    return
+end
+
+local function movePosY()
+    robot.up()
+    y = y + 1
+    return
+end
+
+local function moveNegY()
+    robot.down()
+    y = y - 1
+    return
+end
+
+local function movePosZ()
+    turnTo(0)
+    robot.forward()
+    z = z + 1
+    return
+end
+
+local function moveNegZ()
+    turnTo(1)
+    robot.forward()
+    z = z - 1
+    return
+end
+
 -- Moves in y, then z, then x
 -- Starting orientation is preserved
 local function moveTo(tx, ty, tz)
     local starto = o
 
     while y < ty do
-        robot.up()
-        y = y + 1
+        movePosY()
     end
     while y > ty do
-        robot.down()
-        y = y - 1
+        moveNegY()
     end
 
-    turnTo(0)
     while z < tz do
-        robot.forward()
-        z = z + 1
+        movePosZ()
     end
     while z > tz do
-        robot.back()
-        z = z - 1
+        moveNegZ()
     end
 
-    turnTo(3)
     while x < tx do
-        robot.forward()
+        movePosX()
     end
     while x > tx do
-        robot.back()
+        moveNegX()
     end
 
     turnTo(starto)
@@ -166,10 +213,9 @@ end
 -- Forward declaration
 local resting
 
+-- Return to charger
+-- Wait for full charge
 local function charging()
-    -- Return to charger
-    -- Where is charger?
-    -- Wait for full charge
     moveTo(chx, chy+1, chz)
     repeat
         os.sleep(1)
@@ -177,9 +223,31 @@ local function charging()
     resting()
 end
 
+-- till all designated blocks
+-- do not till blocks which are already tilled
 local function tilling()
-    -- till all designated blocks
-    -- do not till blocks which are already tilled
+    moveTo(fmx, fmy, fmz)
+
+    for h = 1, fmh do
+        local tmpx1, tmpy1, tmpz1 = x, y, z -- start of major row
+        for w = 1, fmw do
+
+            -- Till 8x8 square
+            for i = 1, 8 do
+                local tmpx2, tmpy2, tmpz2 = x, y, z -- start of minor row
+                for j = 1, 8 do
+                    tillBelow()
+                    moveNegX()
+                end
+                moveTo(tmpx2, tmpy2, z) -- return to start of minor row
+                movePosZ()
+            end
+
+            moveTo(x - 8, y, z)
+        end
+        moveTo(tmpx1, tmpy1, z) -- return to start of major row
+    end
+
     computer.pushSignal("SOW")
     resting()
 end
