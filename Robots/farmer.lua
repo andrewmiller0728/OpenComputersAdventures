@@ -1,3 +1,9 @@
+-- Author: Andrew Miller
+-- Date: 2020-10-11
+
+-- Lua Conventions:
+-- https://ocdoc.cil.li/lua_conventions
+
 -- [[ PLANT FARMING ROBOT ]]--
 -- Goals:
 --      - Sowing seeds in tilled soil
@@ -153,18 +159,8 @@ end
 
 -- [[ STATES ]] --
 
-local function resting()
-    moveTo(0, 0, 0)
-    local currEvent = nil
-    repeat 
-        currEvent = event.pull(5) 
-    until currEvent ~= nil end
-    if currEvent == "HARVEST" then
-        harvesting()
-    elseif currEvent == "SOW" then
-        sowing()
-    end
-end
+-- Forward declaration
+local resting
 
 local function charging()
     -- Return to charger
@@ -183,7 +179,6 @@ end
 local function sowing()
     -- sow seeds in all designated, tilled, unoccupied blocks
     -- return unused seeds to storage
-
     harvestTimer = event.Timer(WHEAT_TIMER, computer.pushSignal("HARVEST", computer.uptime()))
     resting()
 end
@@ -192,7 +187,28 @@ local function harvesting()
     -- Harvest all crops at appropriate intervals
     -- Return harvested crops and seeds to storage
     -- BONUS: havest only mature crops
-    resting()
+    computer.pushSignal("TILL")
+end
+
+function resting()
+    moveTo(0, 0, 0)
+
+    checkBattery()
+
+    local currEvent = nil
+    repeat
+        currEvent = event.pull(5)
+    until currEvent ~= nil
+
+    if currEvent == "HARVEST" then
+        harvesting()
+    elseif currEvent == "SOW" then
+        sowing()
+    elseif currEvent == "TILL" then
+        tilling()
+    elseif currEvent == "CHARGE" then
+        charging()
+    end
 end
 
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
