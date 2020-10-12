@@ -122,7 +122,14 @@ local function tillBelow()
     if not robot.compareDown() then
         robot.swingDown()
     end
-    
+
+    return
+end
+
+local function sowBelow()
+    -- if there aren't any seeds in inventory, get seeds
+    -- select seeds from inventory
+    -- if the ground below isn't sown, sow a seed
     return
 end
 
@@ -260,9 +267,31 @@ local function tilling()
     resting()
 end
 
+-- sow seeds in all designated, tilled, unoccupied blocks
+-- return unused seeds to storage
 local function sowing()
-    -- sow seeds in all designated, tilled, unoccupied blocks
-    -- return unused seeds to storage
+    moveTo(fmx, fmy, fmz)
+
+    for h = 1, fmh do
+        local tmpx1, tmpy1, tmpz1 = x, y, z -- start of major row
+        for w = 1, fmw do
+
+            -- Sow 8x8 square
+            for i = 1, 8 do
+                local tmpx2, tmpy2, tmpz2 = x, y, z -- start of minor row
+                for j = 1, 8 do
+                    sowBelow()
+                    moveNegX()
+                end
+                moveTo(tmpx2, tmpy2, z) -- return to start of minor row
+                movePosZ()
+            end
+
+            moveTo(x - 8, y, z)
+        end
+        moveTo(tmpx1, tmpy1, z) -- return to start of major row
+    end
+
     harvestTimer = event.Timer(WHEAT_TIMER, computer.pushSignal("HARVEST", computer.uptime()))
     resting()
 end
