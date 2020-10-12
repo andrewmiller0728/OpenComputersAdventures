@@ -161,6 +161,8 @@ local function resting()
     until currEvent ~= nil end
     if currEvent == "HARVEST" then
         harvesting()
+    elseif currEvent == "SOW" then
+        sowing()
     end
 end
 
@@ -181,7 +183,7 @@ end
 local function sowing()
     -- sow seeds in all designated, tilled, unoccupied blocks
     -- return unused seeds to storage
-    
+
     harvestTimer = event.Timer(WHEAT_TIMER, computer.pushSignal("HARVEST", computer.uptime()))
     resting()
 end
