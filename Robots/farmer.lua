@@ -45,6 +45,7 @@ local fmw, fmh
 -- [[ SET UP]] --
 
 local component = require("component")
+local robotComp = component.robot
 local computer = require("computer")
 local robot = require("robot")
 local shell = require("shell")
@@ -113,8 +114,15 @@ end
 
 -- Tills dirt block below with a hoe
 local function tillBelow()
-    -- if a hoe is broken/missing:
-    replaceTool("HOE")
+    if not robot.count(1) then
+        replaceTool("HOE")
+    end
+
+    robot.select(5) -- select first inventory slot
+    if not robot.compareDown() then
+        robot.swingDown()
+    end
+    
     return
 end
 
