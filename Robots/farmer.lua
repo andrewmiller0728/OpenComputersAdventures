@@ -292,6 +292,8 @@ local function sowing()
         moveTo(tmpx1, tmpy1, z) -- return to start of major row
     end
 
+    -- return unused seeds to storage
+
     harvestTimer = event.Timer(WHEAT_TIMER, computer.pushSignal("HARVEST", computer.uptime()))
     resting()
 end
