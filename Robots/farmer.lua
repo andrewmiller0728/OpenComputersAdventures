@@ -31,6 +31,10 @@ local LOW_BATTERY = 0.15
 local WHEAT_TIMER = 30 * 60 -- 30 minutes in seconds
 
 local harvestTimer
+
+-- Charger Location
+local chx, chy, chz
+
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
 
 
@@ -166,6 +170,10 @@ local function charging()
     -- Return to charger
     -- Where is charger?
     -- Wait for full charge
+    moveTo(chx, chy+1, chz)
+    repeat
+        os.sleep(1)
+    until getBatteryLevel() >= 0.95
     resting()
 end
 
