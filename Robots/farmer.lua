@@ -22,6 +22,7 @@
 --
 --      - https://ocdoc.cil.li/component:robot
 --      - https://ocdoc.cil.li/component:computer
+--      - https://ocdoc.cil.li/component:inventory_controller
 
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
 
@@ -34,6 +35,8 @@ local harvestTimer
 
 -- Charger Location
 local chx, chy, chz
+-- Storage Location
+local stx, sty, stz
 -- Farm Southeast Corner
 local fmx, fmy, fmz
 -- Farm Square Dimensions
@@ -45,13 +48,14 @@ local fmw, fmh
 -- [[ SET UP]] --
 
 local component = require("component")
-local robotComp = component.robot
+local robotComponent = component.robot
 local computer = require("computer")
 local robot = require("robot")
 local shell = require("shell")
 local sides = require("sides")
 local event = require("event")
 local thread = require("thread")
+local inventoryController = require("inventory_controller")
 
 -- Program must be run on a robot
 if not component.isAvailable("robot") then
@@ -114,23 +118,26 @@ end
 
 -- Tills dirt block below with a hoe
 local function tillBelow()
-    if not robot.count(1) then
+    local slot1 = inventoryController.getStackInInternalSlot(1)
+    if string.match(slot1["id"], ".+_hoe") and slot1["damage"] / slot1["maxDamage"] > 0.95 then
         replaceTool("HOE")
     end
 
-    robot.select(5) -- select first inventory slot
-    if not robot.compareDown() then
-        robot.swingDown()
-    end
+    robot.swingDown()
 
     return
 end
 
+-- if there aren't any seeds in inventory, get seeds
+-- select seeds from inventory
+-- if the ground below isn't sown, sow a seed
 local function sowBelow()
-    -- if there aren't any seeds in inventory, get seeds
-    -- select seeds from inventory
-    -- if the ground below isn't sown, sow a seed
-    return
+    robotComponent.select(5)
+    if robotComponent.count() < 1 then
+        robot.useDown()
+        return true
+    end
+    return false
 end
 
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
@@ -235,7 +242,7 @@ local function charging()
     repeat
         os.sleep(1)
     until getBatteryLevel() >= 0.95
-    resting()
+    return resting()
 end
 
 -- till all designated blocks
@@ -264,7 +271,7 @@ local function tilling()
     end
 
     computer.pushSignal("SOW")
-    resting()
+    return resting()
 end
 
 -- sow seeds in all designated, tilled, unoccupied blocks
@@ -295,14 +302,15 @@ local function sowing()
     -- return unused seeds to storage
 
     harvestTimer = event.Timer(WHEAT_TIMER, computer.pushSignal("HARVEST", computer.uptime()))
-    resting()
+    return resting()
 end
 
+-- Harvest all crops at appropriate intervals
+-- Return harvested crops and seeds to storage
+-- BONUS: havest only mature crops
 local function harvesting()
-    -- Harvest all crops at appropriate intervals
-    -- Return harvested crops and seeds to storage
-    -- BONUS: havest only mature crops
     computer.pushSignal("TILL")
+    return resting()
 end
 
 function resting()
