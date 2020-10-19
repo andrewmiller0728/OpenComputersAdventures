@@ -204,19 +204,19 @@ local function checkBattery()
     return
 end
 
-local function replaceTool(tool)
-    -- Discard current tool
-    -- Retrieve new tool from storage
-    -- BONUS: if no tools in storage, make one
-    return
-end
+-- local function replaceTool(tool)
+--     -- Discard current tool
+--     -- Retrieve new tool from storage
+--     -- BONUS: if no tools in storage, make one
+--     return
+-- end
 
 -- Tills dirt block below with a hoe
 local function tillBelow(lx, ly, lz)
-    local slot1 = inventoryController.getStackInInternalSlot(1)
-    if string.match(slot1["id"], ".+_hoe") and slot1["damage"] / slot1["maxDamage"] > 0.95 then
-        replaceTool("HOE")
-    end
+    -- local slot1 = inventoryController.getStackInInternalSlot(1)
+    -- if string.match(slot1["id"], ".+_hoe") and slot1["damage"] / slot1["maxDamage"] > 0.95 then
+    --     replaceTool("HOE")
+    -- end
 
     local tries = 100
     local flag
