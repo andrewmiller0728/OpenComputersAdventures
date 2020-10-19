@@ -223,7 +223,7 @@ local function tillBelow(lx, ly, lz)
     repeat
         flag, _ = robot.useDown()
         tries = tries - 1
-    until flag or tries <= 0 or (x == lx - 5 and z == lz + 5)
+    until flag or tries <= 0 or (x == lx + 5 and z == lz + 5)
     return
 end
 
@@ -257,7 +257,7 @@ local function sowBelow(lx, ly, lz)
         local tries = 100
         repeat
             tries = tries - 1
-        until tries == 0 or (x == lx - 5 and z == lz + 5) or robot.place(sides.bottom)
+        until tries == 0 or (x == lx + 5 and z == lz + 5) or robot.place(sides.bottom)
         return true
     end
     return false
