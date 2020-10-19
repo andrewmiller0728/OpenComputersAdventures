@@ -233,7 +233,7 @@ local function tillSquare()
     repeat
         repeat
             tillBelow(lx, ly, lz)
-            moveNegX()
+            movePosX()
         until x >= lx + 9
         tillBelow(lx, ly, lz)
         moveTo(lx, ly, z)
@@ -241,7 +241,7 @@ local function tillSquare()
     until z >= lz + 9
     repeat
         tillBelow(lx, ly, lz)
-        moveNegX()
+        movePosX()
     until x <= lx - 9
     tillBelow(lx, ly, lz)
     moveTo(lx, ly, z)
@@ -269,7 +269,7 @@ local function sowSquare()
     repeat
         repeat
             sowBelow(lx, ly, lz)
-            moveNegX()
+            movePosX()
         until x >= lx + 9
         sowBelow(lx, ly, lz)
         moveTo(lx, ly, z)
@@ -278,7 +278,7 @@ local function sowSquare()
 
     repeat
         sowBelow(lx, ly, lz)
-        moveNegX()
+        movePosX()
     until x >= lx + 9
 
     sowBelow(lx, ly, lz)
