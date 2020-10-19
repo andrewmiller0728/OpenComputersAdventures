@@ -55,7 +55,7 @@ local shell = require("shell")
 local sides = require("sides")
 local event = require("event")
 local thread = require("thread")
-local inventoryController = require("inventory_controller")
+local inventoryController = component.inventory_controller
 
 -- Program must be run on a robot
 if not component.isAvailable("robot") then
@@ -91,54 +91,6 @@ io.close(farmFile)
 
 -- Save init position and orientation data
 local x, y, z, o = 0, 0, 0, 0
-
----------- ---------- ---------- ---------- ---------- ---------- ----------
-
-
--- [[ COMMON TASKS ]] --
-
-local function getBatteryLevel()
-    return computer.energy() / computer.maxEnergy()
-end
-
-local function checkBattery()
-    local batteryLevel = getBatteryLevel()
-    if (batteryLevel <= LOW_BATTERY) then
-        computer.pushSignal("CHARGE", batteryLevel)
-    end
-    return
-end
-
-local function replaceTool(tool)
-    -- Discard current tool
-    -- Retrieve new tool from storage
-    -- BONUS: if no tools in storage, make one
-    return
-end
-
--- Tills dirt block below with a hoe
-local function tillBelow()
-    local slot1 = inventoryController.getStackInInternalSlot(1)
-    if string.match(slot1["id"], ".+_hoe") and slot1["damage"] / slot1["maxDamage"] > 0.95 then
-        replaceTool("HOE")
-    end
-
-    robot.swingDown()
-
-    return
-end
-
--- if there aren't any seeds in inventory, get seeds
--- select seeds from inventory
--- if the ground below isn't sown, sow a seed
-local function sowBelow()
-    robotComponent.select(5)
-    if robotComponent.count() < 1 then
-        robot.useDown()
-        return true
-    end
-    return false
-end
 
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
 
@@ -192,7 +144,7 @@ local function movePosZ()
 end
 
 local function moveNegZ()
-    turnTo(1)
+    turnTo(2)
     robot.forward()
     z = z - 1
     return
@@ -230,6 +182,70 @@ end
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
 
 
+-- [[ COMMON TASKS ]] --
+
+local function getBatteryLevel()
+    return computer.energy() / computer.maxEnergy()
+end
+
+local function checkBattery()
+    local batteryLevel = getBatteryLevel()
+    if (batteryLevel <= LOW_BATTERY) then
+        computer.pushSignal("CHARGE", batteryLevel)
+    end
+    return
+end
+
+local function replaceTool(tool)
+    -- Discard current tool
+    -- Retrieve new tool from storage
+    -- BONUS: if no tools in storage, make one
+    return
+end
+
+-- Tills dirt block below with a hoe
+local function tillBelow(lx, ly, lz)
+    local slot1 = inventoryController.getStackInInternalSlot(1)
+    if string.match(slot1["id"], ".+_hoe") and slot1["damage"] / slot1["maxDamage"] > 0.95 then
+        replaceTool("HOE")
+    end
+
+    local flag
+    repeat
+        flag, _ = robot.useDown()
+    until flag or (x == lx - 5 and z == lz + 5)
+    return
+end
+
+local function tillSquare()
+    local lx, ly, lz, lo = x, y, z, o
+    
+    repeat
+        repeat
+            tillBelow(lx, ly, lz)
+            moveNegX()
+        until x <= lx - 9
+        tillBelow(lx, ly, lz)
+        moveTo(lx, ly, z)
+        movePosZ()
+    until z >= lz + 9
+end
+
+-- if there aren't any seeds in inventory, get seeds
+-- select seeds from inventory
+-- if the ground below isn't sown, sow a seed
+local function sowBelow()
+    robotComponent.select(5)
+    if robotComponent.count() < 1 then
+        robot.useDown()
+        return true
+    end
+    return false
+end
+
+---------- ---------- ---------- ---------- ---------- ---------- ----------
+
+
 -- [[ STATES ]] --
 
 -- Forward declaration
@@ -250,25 +266,7 @@ end
 local function tilling()
     moveTo(fmx, fmy, fmz)
 
-    for h = 1, fmh do
-        local tmpx1, tmpy1, tmpz1 = x, y, z -- start of major row
-        for w = 1, fmw do
-
-            -- Till 8x8 square
-            for i = 1, 8 do
-                local tmpx2, tmpy2, tmpz2 = x, y, z -- start of minor row
-                for j = 1, 8 do
-                    tillBelow()
-                    moveNegX()
-                end
-                moveTo(tmpx2, tmpy2, z) -- return to start of minor row
-                movePosZ()
-            end
-
-            moveTo(x - 8, y, z)
-        end
-        moveTo(tmpx1, tmpy1, z) -- return to start of major row
-    end
+    tillSquare()
 
     computer.pushSignal("SOW")
     return resting()
@@ -279,25 +277,7 @@ end
 local function sowing()
     moveTo(fmx, fmy, fmz)
 
-    for h = 1, fmh do
-        local tmpx1, tmpy1, tmpz1 = x, y, z -- start of major row
-        for w = 1, fmw do
-
-            -- Sow 8x8 square
-            for i = 1, 8 do
-                local tmpx2, tmpy2, tmpz2 = x, y, z -- start of minor row
-                for j = 1, 8 do
-                    sowBelow()
-                    moveNegX()
-                end
-                moveTo(tmpx2, tmpy2, z) -- return to start of minor row
-                movePosZ()
-            end
-
-            moveTo(x - 8, y, z)
-        end
-        moveTo(tmpx1, tmpy1, z) -- return to start of major row
-    end
+    
 
     -- return unused seeds to storage
 
