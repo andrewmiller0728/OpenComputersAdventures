@@ -56,6 +56,7 @@ local sides = require("sides")
 local event = require("event")
 local thread = require("thread")
 local inventoryController = component.inventory_controller
+local colors = require("colors")
 
 -- Program must be run on a robot
 if not component.isAvailable("robot") then
@@ -83,11 +84,18 @@ elseif false then -- TODO: if file not found then
 end
 
 -- TODO: Parse farm file and build database
-local farmFile = io.open(filename, "r")
-for i = 1, io.lines() do
-    io.write(io.read("l"))
-end
-io.close(farmFile)
+-- local farmFile = io.open(filename, "r")
+-- for i = 1, io.lines() do
+--     io.write(io.read("l"))
+-- end
+-- io.close(farmFile)
+
+-- Charger Location
+chx, chy, chz = 0, 0, 0
+-- Storage Location
+stx, sty, stz = 0, 0, 0
+-- Farm Southwest Corner
+fmx, fmy, fmz = 1, 0, 1
 
 -- Save init position and orientation data
 local x, y, z, o = 0, 0, 0, 0
@@ -99,7 +107,7 @@ local x, y, z, o = 0, 0, 0, 0
 
 -- Turns to specified orientation
 local function turnTo(to)
-    if o == to - 1 then
+    if o == to - 1 or o == 3 then
         robot.turnRight()
         o = (o + 1) % 4
     else
@@ -210,10 +218,12 @@ local function tillBelow(lx, ly, lz)
         replaceTool("HOE")
     end
 
+    local tries = 100
     local flag
     repeat
         flag, _ = robot.useDown()
-    until flag or (x == lx - 5 and z == lz + 5)
+        tries = tries - 1
+    until flag or tries <= 0 or (x == lx - 5 and z == lz + 5)
     return
 end
 
@@ -224,23 +234,56 @@ local function tillSquare()
         repeat
             tillBelow(lx, ly, lz)
             moveNegX()
-        until x <= lx - 9
+        until x >= lx + 9
         tillBelow(lx, ly, lz)
         moveTo(lx, ly, z)
         movePosZ()
     until z >= lz + 9
+    repeat
+        tillBelow(lx, ly, lz)
+        moveNegX()
+    until x <= lx - 9
+    tillBelow(lx, ly, lz)
+    moveTo(lx, ly, z)
+    turnTo(lo)
 end
 
 -- if there aren't any seeds in inventory, get seeds
 -- select seeds from inventory
 -- if the ground below isn't sown, sow a seed
-local function sowBelow()
-    robotComponent.select(5)
-    if robotComponent.count() < 1 then
-        robot.useDown()
+local function sowBelow(lx, ly, lz)
+    robotComponent.select(1)
+    if robotComponent.count() > 1 then
+        local tries = 100
+        repeat
+            tries = tries - 1
+        until tries == 0 or (x == lx - 5 and z == lz + 5) or robot.place(sides.bottom)
         return true
     end
     return false
+end
+
+local function sowSquare()
+    local lx, ly, lz, lo = x, y, z, o
+    
+    repeat
+        repeat
+            sowBelow(lx, ly, lz)
+            moveNegX()
+        until x >= lx + 9
+        sowBelow(lx, ly, lz)
+        moveTo(lx, ly, z)
+        movePosZ()
+    until z >= lz + 9
+
+    repeat
+        sowBelow(lx, ly, lz)
+        moveNegX()
+    until x >= lx + 9
+
+    sowBelow(lx, ly, lz)
+    moveTo(lx, ly, z)
+    turnTo(lo)
 end
 
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
@@ -254,30 +297,38 @@ local resting
 -- Return to charger
 -- Wait for full charge
 local function charging()
+    robotComponent.setLightColor(0xff0000)
+
     moveTo(chx, chy+1, chz)
+
     repeat
         os.sleep(1)
     until getBatteryLevel() >= 0.95
+
     return resting()
 end
 
 -- till all designated blocks
 -- do not till blocks which are already tilled
 local function tilling()
+    robotComponent.setLightColor(0x999900)
+
     moveTo(fmx, fmy, fmz)
 
     tillSquare()
 
     computer.pushSignal("SOW")
+
     return resting()
 end
 
 -- sow seeds in all designated, tilled, unoccupied blocks
 -- return unused seeds to storage
 local function sowing()
+    robotComponent.setLightColor(0x00ff00)
     moveTo(fmx, fmy, fmz)
 
-    
+    sowSquare()
 
     -- return unused seeds to storage
 
@@ -289,11 +340,16 @@ end
 -- Return harvested crops and seeds to storage
 -- BONUS: havest only mature crops
 local function harvesting()
+    robotComponent.setLightColor(0x00ffff)
+
     computer.pushSignal("TILL")
+
     return resting()
 end
 
 function resting()
+    robotComponent.setLightColor(0x0000ff)
+
     moveTo(0, 0, 0)
 
     checkBattery()
@@ -304,13 +360,15 @@ function resting()
     until currEvent ~= nil
 
     if currEvent == "HARVEST" then
-        harvesting()
+        return harvesting()
     elseif currEvent == "SOW" then
-        sowing()
+        return sowing()
     elseif currEvent == "TILL" then
-        tilling()
+        return tilling()
     elseif currEvent == "CHARGE" then
-        charging()
+        return charging()
+    else
+        return resting()
     end
 end
 
