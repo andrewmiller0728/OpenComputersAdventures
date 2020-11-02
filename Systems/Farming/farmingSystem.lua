@@ -27,9 +27,15 @@ local function trackTime(time)
     return true
 end
 
-local function signalPusher()
-    computer.pushSignal("TIMER")
+local function signalPusher(text)
+    computer.pushSignal(text)
     return true
+end
+
+local function startTimerThread(growTime, text)
+    local time = {}
+    time["H"], time["M"], time["S"] = 0, 0, 0
+    return thread.create(trackTime, time)
 end
 
 local function openFlood()
@@ -61,30 +67,3 @@ local function drawStatus(boxX, boxY, boxW, boxH, text)
     component.gpu.set(textX, textY, text)
 end
 
-
--- [[ MAIN ]] --
-
--- Outline:
--- Multiple farm plots run at once
--- Farm plot statuses: {Sowing, Growing, Harvesting, Suspended, Dead}
--- Sowing:
---      <Crop> seeds are planted in each available block of farmland by robot
---      Robot returns to charger
---      Set status to Growing
--- Growing:
---      Timer is set for <duration>
---      When timer goes off, set status to Harvesting
--- Harvesting:
---      Flood plot with water from dispensers/pistons
---      Wait for collection
---      Close dispensers/pistons
---      Set status to Sowing
--- Suspended:
---      Plot is paused and current status is saved
---      Dispensers/pistons are closed if open
---      A suspended plot can be resumed back to the status it was suspended in
--- Dead:
---      Plot is killed regardless of status
---      Dispensers/pistons are closed if open
---      Plot data is removed from memory
---      A dead plot cannot be resumed

@@ -1,0 +1,41 @@
+Outline:
+Multiple farm plots run at once
+Farm plot statuses: {Initializing, Sowing, Growing, Harvesting, Suspended, Dead}
+Initializing:
+     Waiting to start program
+Sowing:
+     Crop seeds are planted in each available block of farmland by robot
+     Robot returns to charger
+     Set status to Growing
+Growing:
+     Timer is set for <duration>
+     When timer goes off, set status to Harvesting
+Harvesting:
+     Flood plot with water from dispensers/pistons
+     Wait for collection
+     Close dispensers/pistons
+     Set status to Sowing
+Suspended:
+     Plot is paused and current status is saved
+     Dispensers/pistons are closed if open
+     A suspended plot can be resumed back to the status it was suspended in
+Dead:
+     Plot is killed regardless of status
+     Dispensers/pistons are closed if open
+     Plot data is removed from memory
+     A dead plot cannot be resumed
+--
+Data Structures:
+Farm list:
+     Table of farm plots and their respective data.
+Farm plot:
+     Table of information about the farm plot
+     Includes:
+         Plot name
+         Type of crop
+         Production rate(s)
+         Current status
+         Total output
+--
+User Interface:
+Display data for each farm plot
