@@ -1,5 +1,6 @@
 
 local farmplot = require("farmplot")
+local farmstatus = require("farmstatus")
 
 -- [[ FarmAdmin ]] --
 
@@ -14,7 +15,27 @@ function farmadmin.createPlot(plotName, plotCrop)
 end
 
 function farmadmin.startPlot(plot)
+    plot = farmplot.startTimer(plot)
+    plot = farmplot.setStatus(plot, farmstatus["SOW"])
+    return plot
+end
 
+function farmadmin.suspendPlot(plot)
+    plot = farmplot.killTimer(plot)
+    plot = farmplot.setStatus(plot, farmstatus["SUSPEND"])
+    return plot
+end
+
+function farmadmin.resumePlot(plot)
+    plot = farmplot.startTimer(plot)
+    plot = farmplot.setStatus(plot.prevStatus)
+    return plot
+end
+
+function farmadmin.killPlot(plot)
+    plot = farmplot.killTimer(plot)
+    plot = farmplot.setStatus(plot, farmstatus["DEAD"])
+    return plot
 end
 
 function farmadmin.getPlotOutput(plot)
