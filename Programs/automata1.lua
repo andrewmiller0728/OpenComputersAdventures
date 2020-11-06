@@ -73,16 +73,16 @@ local iterations = 1000
 local delay = 0.1
 
 -- Fill base cells
-for y = 1, h do
-    local row = {}
-    for x = 1, w do
+for x = 1, w do
+    local column = {}
+    for y = 1, h do
         if y > h / 2 - 10 and y < h / 2 + 10 then
-            table.insert(row, 1)
+            table.insert(column, 1)
         else
-            table.insert(row, 0)
+            table.insert(column, 0)
         end
     end
-    table.insert(cells, row)
+    table.insert(cells, column)
 end
 
 -- Loop simulation
