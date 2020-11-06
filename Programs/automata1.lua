@@ -43,6 +43,13 @@ end
 
 local function getNextCells(cells)
     local nextCells = {}
+    for x = 1, w do
+        local column = {}
+        for y = 1, h do
+            table.insert(column, 0)
+        end
+        table.insert(nextCells, column)
+    end
     for x = 2, w - 1 do
         for y = 2, h - 1 do
             local nCount = getNeighborCount(getMooreSpace(cells, x, y))
