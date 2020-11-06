@@ -71,9 +71,9 @@ local function drawCells(cells)
             elseif currValue == 0 and currChar == "&" then
                 gpu.set(x, y, " ")
             else
-                return false
+                -- do nothing
             end
-            
+
         end
     end
     return true
@@ -88,11 +88,7 @@ local delay = 0.01
 for x = 1, w do
     local column = {}
     for y = 1, h do
-        if y > h / 2 - 10 and y < h / 2 + 10 and x > w / 2 - 10 and x < w / 2 + 10 then
-            table.insert(column, 1)
-        else
-            table.insert(column, 0)
-        end
+        table.insert(column, math.random(0, 1))
     end
     table.insert(cells, column)
 end
