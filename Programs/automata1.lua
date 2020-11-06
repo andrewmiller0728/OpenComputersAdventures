@@ -6,7 +6,7 @@ local w, h = gpu.getResolution()
 
 gpu.setDepth(gpu.maxDepth())
 gpu.setBackground(0x3C3C3C)
-gpu.setForeground(0x006D00)
+gpu.setForeground(0x000000)
 gpu.fill(1, 1, w, h, " ")
 
 
