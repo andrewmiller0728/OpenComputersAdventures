@@ -94,6 +94,7 @@ end
 
 -- Loop simulation
 for n = 1, iterations do
+    gpu.set(5, 5, string.format("%d/%d iterations", n, iterations))
     drawCells(cells)
     cells = getNextCells(cells)
     os.sleep(delay)
