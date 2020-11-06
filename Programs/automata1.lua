@@ -65,13 +65,19 @@ local function drawCells(cells)
 
             local currValue = cells[x][y]
             local currChar, _, _, _, _ = gpu.get(x, y)
+            local flag = false
 
             if currValue == 1 and currChar == " " then
                 gpu.set(x, y, "&")
+                flag = true
             elseif currValue == 0 and currChar == "&" then
                 gpu.set(x, y, " ")
             else
                 -- do nothing
+            end
+            
+            if flag == false then
+                return false
             end
 
         end
@@ -82,7 +88,7 @@ end
 
 local cells = {}
 local iterations = 100
-local delay = 0.01
+local delay = 0.001
 
 -- Fill base cells
 for x = 1, w do
@@ -95,8 +101,12 @@ end
 
 -- Loop simulation
 for n = 1, iterations do
-    drawCells(cells)
+    if drawCells(cells) == false then
+        return false
+    end
     gpu.set(5, 5, string.format("%d/%d iterations", n, iterations))
     cells = getNextCells(cells)
     os.sleep(delay)
 end
+
+return true
