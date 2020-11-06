@@ -62,13 +62,18 @@ end
 local function drawCells(cells)
     for x = 1, w do
         for y = 1, h do
-            if cells[x][y] == 1 and gpu.get(x, y) ~= "&" then
+
+            local currValue = cells[x][y]
+            local currChar, _, _, _, _ = gpu.get(x, y)
+
+            if currValue == 1 and currChar == " " then
                 gpu.set(x, y, "&")
-            elseif cells[x][y] == 0 and gpu.get(x, y) ~= " " then
+            elseif currValue == 0 and currChar == "&" then
                 gpu.set(x, y, " ")
             else
                 return false
             end
+            
         end
     end
     return true
@@ -77,7 +82,7 @@ end
 
 local cells = {}
 local iterations = 100
-local delay = 0.001
+local delay = 0.01
 
 -- Fill base cells
 for x = 1, w do
