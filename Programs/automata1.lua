@@ -82,6 +82,7 @@ for y = 1, h do
             table.insert(row, 0)
         end
     end
+    table.insert(cells, row)
 end
 
 -- Loop simulation
