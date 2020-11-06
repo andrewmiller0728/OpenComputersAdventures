@@ -43,8 +43,8 @@ end
 
 local function getNextCells(cells)
     local nextCells = {}
-    for x = 1, w do
-        for y = 1, h do
+    for x = 2, w - 1 do
+        for y = 2, h - 1 do
             local nCount = getNeighborCount(getMooreSpace(cells, x, y))
             nextCells[x][y] = getNextStatus(cells[x][y], nCount)
         end
