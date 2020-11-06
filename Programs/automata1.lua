@@ -73,9 +73,13 @@ local iterations = 1000
 local delay = 0.1
 
 -- Fill base cells
-for i = w / 2 - 10, w / 2 + 10 do
-    for j = h / 2 - 10, h / 2 + 10 do
-        cells[i][j] = 1
+for x = 1, w do
+    for y = 1, h do
+        if x < w / 2 and y < h / 2 then
+            cells[x][y] = 1
+        else
+            cells[x][y] = 0
+        end
     end
 end
 
@@ -83,4 +87,5 @@ end
 for n = 1, iterations do
     drawCells(cells)
     cells = getNextCells(cells)
+    os.sleep(delay)
 end
