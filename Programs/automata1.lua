@@ -62,9 +62,9 @@ end
 local function drawCells(cells)
     for x = 1, w do
         for y = 1, h do
-            if cells[x][y] == 1 then
+            if cells[x][y] == 1 and gpu.get(x, y) ~= "&" then
                 gpu.set(x, y, "&")
-            elseif cells[x][y] == 0 then
+            elseif cells[x][y] == 0 and gpu.get(x, y) ~= " " then
                 gpu.set(x, y, " ")
             else
                 return false
@@ -76,7 +76,7 @@ end
 
 
 local cells = {}
-local iterations = 1000
+local iterations = 100
 local delay = 0.001
 
 -- Fill base cells
@@ -94,8 +94,8 @@ end
 
 -- Loop simulation
 for n = 1, iterations do
-    gpu.set(5, 5, string.format("%d/%d iterations", n, iterations))
     drawCells(cells)
+    gpu.set(5, 5, string.format("%d/%d iterations", n, iterations))
     cells = getNextCells(cells)
     os.sleep(delay)
 end
