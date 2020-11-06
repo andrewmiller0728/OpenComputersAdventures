@@ -73,12 +73,13 @@ local iterations = 1000
 local delay = 0.1
 
 -- Fill base cells
-for x = 1, w do
-    for y = 1, h do
-        if x < w / 2 and y < h / 2 then
-            cells[x][y] = 1
+for y = 1, h do
+    local row = {}
+    for x = 1, w do
+        if y > h / 2 - 10 and y < h / 2 + 10 then
+            table.insert(row, 1)
         else
-            cells[x][y] = 0
+            table.insert(row, 0)
         end
     end
 end
