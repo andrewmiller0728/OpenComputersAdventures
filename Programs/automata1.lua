@@ -77,13 +77,13 @@ end
 
 local cells = {}
 local iterations = 1000
-local delay = 0.1
+local delay = 0.001
 
 -- Fill base cells
 for x = 1, w do
     local column = {}
     for y = 1, h do
-        if y > h / 2 - 10 and y < h / 2 + 10 then
+        if y > h / 2 - 10 and y < h / 2 + 10 and x > w / 2 - 10 and y < h / 2 - 10 then
             table.insert(column, 1)
         else
             table.insert(column, 0)
