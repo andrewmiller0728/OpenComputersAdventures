@@ -60,29 +60,24 @@ local function getNextCells(cells)
 end
 
 local function drawCells(cells)
+    local flag = false
+
     for x = 1, w do
         for y = 1, h do
-
             local currValue = cells[x][y]
             local currChar, _, _, _, _ = gpu.get(x, y)
-            local flag = false
 
             if currValue == 1 and currChar == " " then
                 gpu.set(x, y, "&")
                 flag = true
             elseif currValue == 0 and currChar == "&" then
                 gpu.set(x, y, " ")
-            else
-                -- do nothing
+                flag = true
             end
-            
-            if flag == false then
-                return false
-            end
-
         end
     end
-    return true
+
+    return flag
 end
 
 
