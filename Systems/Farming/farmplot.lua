@@ -36,6 +36,7 @@ local function trackUptime(plot)
     return true
 end
 
+
 local stopwatch
 
 function farmplot.startTimer(plot)

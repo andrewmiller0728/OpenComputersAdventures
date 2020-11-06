@@ -28,7 +28,7 @@ end
 
 function farmadmin.resumePlot(plot)
     plot = farmplot.startTimer(plot)
-    plot = farmplot.setStatus(plot.prevStatus)
+    plot = farmplot.setStatus(plot, plot.prevStatus)
     return plot
 end
 
