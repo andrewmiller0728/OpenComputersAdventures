@@ -97,7 +97,10 @@ end
 -- Loop simulation
 for n = 1, iterations do
     if drawCells(cells) == false then
-        break
+        gpu.setBackground(0x000000)
+        gpu.setForeground(0xFFFFFF)
+        gpu.fill(1, 1, w, h, " ")
+        return false
     end
     gpu.set(5, 5, string.format("%d/%d iterations", n, iterations))
     cells = getNextCells(cells)
